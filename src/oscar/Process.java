@@ -1,31 +1,43 @@
 package src.oscar;
 
 public class Process {
-    private int PID = 0;
-    private int inputTime = 0;
-    private int burstTime = 0;
+    private String ID;
+    private int arrivalTime;
+    private int burstTime;
+    private int runningTime;
+    private int turnaroundTime;
+    private int idleTime;
+    private int awakeTime;
 
-    public Process() {
-    }
-
-    public Process(int _PID, int _inputTime, int _burstTime) {
-        setPID(_PID);
-        setInputTime(_inputTime);
+    public Process(String _ID, int _arrivalTime, int _burstTime){
+        setID(_ID);
+        setArrivalTime(_arrivalTime);
         setBurstTime(_burstTime);
+        setRunningTime(0);
+        setIdleTime(0);
+        setTurnaroundTime(0);
+    } 
+
+    public Process(String _ID, int _arrivalTime, int _burstTime, int _idleTime, int _awakeTime){
+        setID(_ID);
+        setArrivalTime(_arrivalTime);
+        setBurstTime(_burstTime);
+        setIdleTime(_idleTime);
+        setAwakeTime(_awakeTime);
+    } 
+
+    public String getID() {
+        return ID;
+    }
+    public void setID(String _ID) {
+        this.ID = _ID;
     }
 
-    public int getPID() {
-        return PID;
+    public int getArrivalTime() {
+        return arrivalTime;
     }
-    public void setPID(int _PID) {
-        this.PID = _PID;
-    }
-
-    public int getInputTime() {
-        return inputTime;
-    }
-    public void setInputTime(int _inputTime) {
-        this.inputTime = _inputTime;
+    public void setArrivalTime(int _arrivalTime) {
+        this.arrivalTime = _arrivalTime;
     }
 
     public int getBurstTime() {
@@ -33,5 +45,44 @@ public class Process {
     }
     public void setBurstTime(int _burstTime) {
         this.burstTime = _burstTime;
+    }
+
+    public int getRunningTime() {
+        return runningTime;
+    }
+    public void setRunningTime(int _runningTime) {
+        this.runningTime = _runningTime;
+    }
+    public void increasRunningTime(){
+        this.runningTime++;
+    }
+
+    public int getTurnaroundTime() {
+        return turnaroundTime;
+    }
+    public void setTurnaroundTime(int _turnaroundTime) {
+        this.turnaroundTime = _turnaroundTime;
+    }
+
+    public int getIdleTime() {
+        return idleTime;
+    }
+    public void setIdleTime(int idleTime) {
+        this.idleTime = idleTime;
+    }
+
+    public int getAwakeTime() {
+        return awakeTime;
+    }
+    public void setAwakeTime(int awakeTime) {
+        this.awakeTime = awakeTime;
+    }
+
+    public int getWaitingTime(){
+        return this.getTurnaroundTime() - this.getBurstTime();
+    }
+
+    public float getNTT(){
+        return (float)getTurnaroundTime()/getBurstTime();
     }
 }
