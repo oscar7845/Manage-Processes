@@ -18,6 +18,10 @@ public class Process {
         setTurnaroundTime(0);
     }
 
+    // App needs getter based on ID of scenebuilder
+    public String getPID() {return PID;}
+    public int getInputTime() {return arrivalTime;}
+
     public String getID() {
         return PID;
     }
