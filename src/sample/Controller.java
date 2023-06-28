@@ -1,4 +1,4 @@
-package src.oscar;
+package sample;
 
 public class Controller {
     

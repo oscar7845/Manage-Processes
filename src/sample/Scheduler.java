@@ -1,44 +1,41 @@
 import java.util.ArrayList;
+import sample.Process;
 
 public abstract class Scheduler {
-    ArrayList<Process> pArr; 
+    ArrayList<Process> pArr;
     ArrayList<Process> queue;
-    ArrayList<Process> result; 
-    Process runningProcess;
+    ArrayList<Process> result;
+    Process Processor;
 
     public Scheduler(){
         pArr = new ArrayList<Process>();
         queue = new ArrayList<Process>();
         result = new ArrayList<Process>();
-        setIdle(); 
+        setIdle(0);
     }
-
-    public void setIdle(){
-        runningProcess = new Process("idle", 0, 99);
-    } 
-
-    public int getSchedulingTime(){
+    public void setIdle(int i){
+        Processor = new Process("idle", i, 0);
+        Processor.setAwakeTime(i);
+    }
+    public int getSchedulingTime() {
         int totalBT = 0;
-        int firstATT = pArr.get(0).getArrivalTime();
-        for(int i = 0;  i< pArr.size(); i++){
+        for (int i = 0; i < pArr.size(); i++) {
             totalBT += pArr.get(i).getBurstTime();
-            if(firstATT > pArr.get(i).getArrivalTime()) firstATT = pArr.get(i).getArrivalTime();
         }
-        return totalBT + firstATT;
+        return totalBT;
     }
     public void insertProcess(Process pi){
         pArr.add(pi);
     }
-
     public void insertQueue(int currentTime){
         for(int i = 0; i < pArr.size(); i++){
             if(pArr.get(i).getArrivalTime() == currentTime) queue.add(pArr.get(i));
         }
-    } 
+    }
 
     public void printResult(){
         for(int i = 0; i < result.size(); i++){
-            System.out.print("[" + result.get(i).getID() + ": " + result.get(i).getAwakeTime() + " - " + result.get(i).getIdleTime() + "] ");
+            System.out.print("[" + result.get(i).getID() + ": " + result.get(i).getArrivalTime() + " - " + result.get(i).getBurstTime() + "] ");
         }
         System.out.println();
         for(int i = 0; i < pArr.size(); i++){
@@ -47,25 +44,21 @@ public abstract class Scheduler {
     }
 
     public void changeProcess(int currentTime){
-        runningProcess.setIdleTime(currentTime);
-        result.add(new Process(runningProcess.getID(), runningProcess.getArrivalTime(), runningProcess.getBurstTime(), runningProcess.getIdleTime(), runningProcess.getAwakeTime()));
+        Processor.setIdleTime(currentTime);
+        if(Processor.getArrivalTime() != Processor.getIdleTime()) result.add(new Process(Processor.getID(), Processor.getAwakeTime(), Processor.getIdleTime()));
         if(!queue.isEmpty()) {
-            runningProcess = queue.get(0);
-            runningProcess.setAwakeTime(currentTime);
+            Processor = queue.get(0);
+            Processor.setAwakeTime(currentTime);
             queue.remove(0);
         }
-        else this.setIdle();
+        else this.setIdle(currentTime);
     }
     public abstract void run();
 
     public static void main(String args[]){
-        Scheduler a = new RRScheduler(2);
-        a.insertProcess(new Process("1", 0, 3));
-        a.insertProcess(new Process("2", 1, 7));
-        a.insertProcess(new Process("3", 3, 2));
-        a.insertProcess(new Process("4", 5, 5));
-        a.insertProcess(new Process("5", 6, 3));
-
+        Scheduler a = new FCFSScheduler();
+        a.insertProcess(new Process("1", 1, 3));
+        a.insertProcess(new Process("2", 2, 2));
         a.run();
     }
 }
