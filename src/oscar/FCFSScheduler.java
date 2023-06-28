@@ -1,22 +1,23 @@
-package src.oscar;
-
 public class FCFSScheduler extends Scheduler {
     public void run(){
-        int schedulingTime = getSchedulingTime(); 
-
-        for(int i = 0; i < schedulingTime + 1; i++){
+        int schedulingTime = getSchedulingTime();
+        for(int i = 0; i <= schedulingTime; i++){
             insertQueue(i);
-            if(runningProcess.getID().equals("idle") && !queue.isEmpty()){
-                runningProcess = queue.get(0);
-                queue.remove(0);
+            if(Processor.getID().equals("idle")){
+                if(!queue.isEmpty()){
+                    if(Processor.getArrivalTime() != 0) schedulingTime++;
+                    changeProcess(i);
+                }
+                else{
+                    schedulingTime++;
+                    continue;
+                }
             }
-            if(runningProcess.getBurstTime() == runningProcess.getRunningTime()){
-                runningProcess.setTurnaroundTime(i - runningProcess.getArrivalTime());
+            if(Processor.getBurstTime() == Processor.getRunningTime()){
+                Processor.setTurnaroundTime(i - Processor.getArrivalTime());
                 changeProcess(i);
             }
-            if(!runningProcess.getID().equals("idle")){
-                runningProcess.increasRunningTime();
-            }
+            if(!Processor.getID().equals("idle")) Processor.increasRunningTime();
         }
         printResult();
     }

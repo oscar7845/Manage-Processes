@@ -1,7 +1,5 @@
-package src.oscar;
-
 public class RRScheduler extends Scheduler {
-    private int delta;
+    private int delta; 
 
     public RRScheduler(int _delta){
         setDelta(_delta);
@@ -15,35 +13,41 @@ public class RRScheduler extends Scheduler {
     }
 
     public void changeProcess(int currentTime){
-        runningProcess.setIdleTime(currentTime);
-        result.add(new Process(runningProcess.getID(), runningProcess.getArrivalTime(), runningProcess.getBurstTime(), runningProcess.getIdleTime(), runningProcess.getAwakeTime()));
+        Processor.setIdleTime(currentTime);
+        if(Processor.getArrivalTime() != Processor.getIdleTime()) result.add(new Process(Processor.getID(), Processor.getAwakeTime(), Processor.getIdleTime()));
+        if(Processor.getBurstTime() > Processor.getRunningTime()) queue.add(Processor);
         if(!queue.isEmpty()) {
-            if(runningProcess.getBurstTime() > runningProcess.getRunningTime()) queue.add(runningProcess);
-            runningProcess = queue.get(0);
-            runningProcess.setAwakeTime(currentTime);
+            Processor = queue.get(0);
+            Processor.setAwakeTime(currentTime);
             queue.remove(0);
         }
-        else this.setIdle();
+        else this.setIdle(currentTime);
     }
 
     public void run(){
-        int runoutTimer = 0;
+        int runOutTimer = 0;
         int schedulingTime = getSchedulingTime();
 
         for(int i = 0; i < schedulingTime + 1; i++){
             insertQueue(i);
-            if(runningProcess.getID().equals("idle") && !queue.isEmpty()){
-                runningProcess = queue.get(0);
-                queue.remove(0);
+            if(Processor.getID().equals("idle")){
+                if(!queue.isEmpty()){
+                    if(Processor.getArrivalTime() != 0) schedulingTime++;
+                    changeProcess(i);
+                }
+                else{
+                    schedulingTime++;
+                    continue;
+                }
             }
-            if(runningProcess.getBurstTime() == runningProcess.getRunningTime() || runoutTimer == this.getDelta()){
-                runningProcess.setTurnaroundTime(i - runningProcess.getArrivalTime());
+            if(Processor.getBurstTime() == Processor.getRunningTime() || runOutTimer == this.getDelta()){
+                Processor.setTurnaroundTime(i - Processor.getArrivalTime());
                 changeProcess(i);
-                runoutTimer = 0;
+                runOutTimer = 0;
             }
-            if(!runningProcess.getID().equals("idle")){
-                runningProcess.increasRunningTime();
-                runoutTimer++;
+            if(!Processor.getID().equals("idle")){
+                Processor.increasRunningTime();
+                runOutTimer++;
             }
         }
         printResult();

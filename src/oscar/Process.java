@@ -1,5 +1,3 @@
-package src.oscar;
-
 public class Process {
     private String ID;
     private int arrivalTime;
@@ -16,15 +14,7 @@ public class Process {
         setRunningTime(0);
         setIdleTime(0);
         setTurnaroundTime(0);
-    } 
-
-    public Process(String _ID, int _arrivalTime, int _burstTime, int _idleTime, int _awakeTime){
-        setID(_ID);
-        setArrivalTime(_arrivalTime);
-        setBurstTime(_burstTime);
-        setIdleTime(_idleTime);
-        setAwakeTime(_awakeTime);
-    } 
+    }
 
     public String getID() {
         return ID;
@@ -81,7 +71,6 @@ public class Process {
     public int getWaitingTime(){
         return this.getTurnaroundTime() - this.getBurstTime();
     }
-
     public float getNTT(){
         return (float)getTurnaroundTime()/getBurstTime();
     }
