@@ -1,5 +1,7 @@
+package src.oscar;
+
 public class Process {
-    private String ID;
+    private String PID;
     private int arrivalTime;
     private int burstTime;
     private int runningTime;
@@ -7,8 +9,8 @@ public class Process {
     private int idleTime;
     private int awakeTime;
 
-    public Process(String _ID, int _arrivalTime, int _burstTime){
-        setID(_ID);
+    public Process(String _PID, int _arrivalTime, int _burstTime){
+        setID(_PID);
         setArrivalTime(_arrivalTime);
         setBurstTime(_burstTime);
         setRunningTime(0);
@@ -16,11 +18,11 @@ public class Process {
         setTurnaroundTime(0);
     }
 
-    public String getID() {
-        return ID;
+    public String getPID() {
+        return PID;
     }
-    public void setID(String _ID) {
-        this.ID = _ID;
+    public void setID(String _PID) {
+        this.PID = _PID;
     }
 
     public int getArrivalTime() {
