@@ -1,7 +1,5 @@
-package sample;
-
 public class Process {
-    private String PID;
+    private String ID;
     private int arrivalTime;
     private int burstTime;
     private int runningTime;
@@ -9,8 +7,8 @@ public class Process {
     private int idleTime;
     private int awakeTime;
 
-    public Process(String _PID, int _arrivalTime, int _burstTime){
-        setID(_PID);
+    public Process(String _ID, int _arrivalTime, int _burstTime){
+        setID(_ID);
         setArrivalTime(_arrivalTime);
         setBurstTime(_burstTime);
         setRunningTime(0);
@@ -18,15 +16,11 @@ public class Process {
         setTurnaroundTime(0);
     }
 
-    // App needs getter based on ID of scenebuilder
-    public String getPID() {return PID;}
-    public int getInputTime() {return arrivalTime;}
-
     public String getID() {
-        return PID;
+        return ID;
     }
-    public void setID(String _PID) {
-        this.PID = _PID;
+    public void setID(String _ID) {
+        this.ID = _ID;
     }
 
     public int getArrivalTime() {

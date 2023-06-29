@@ -1,6 +1,3 @@
-package sample;
-import sample.Scheduler;
-
 public class FCFSScheduler extends Scheduler {
     public void run(){
         int schedulingTime = getSchedulingTime();

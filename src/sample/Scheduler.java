@@ -1,7 +1,4 @@
-package sample;
-
 import java.util.ArrayList;
-import sample.Process;
 
 public abstract class Scheduler {
     ArrayList<Process> pArr;
@@ -57,11 +54,10 @@ public abstract class Scheduler {
     }
     public abstract void run();
 
-    /*public static void main(String args[]){
-        Scheduler a = new FCFSScheduler();
-        a.insertProcess(new Process("1", 1, 3));
-        a.insertProcess(new Process("2", 2, 2));
+    public static void main(String args[]){
+        Scheduler a = new RRScheduler(2);
+        a.insertProcess(new Process("1", 0, 3));
         a.run();
-    }*/
+    }
 }
 
