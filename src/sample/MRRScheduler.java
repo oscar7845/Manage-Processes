@@ -24,7 +24,7 @@ public class MRRScheduler extends Scheduler {
         if(Processor.getBurstTime() - Processor.getRunningTime() > 0 && Processor.getBurstTime() - Processor.getRunningTime() < getMercy() && !Processor.getID().equals("idle")){
         }
         else{
-            if(Processor.getArrivalTime() != Processor.getIdleTime()) result.add(new Process(Processor.getID(), Processor.getAwakeTime(), Processor.getIdleTime()));
+            if(!Processor.getID().equals("idle")) result.add(new Process(Processor.getID(), Processor.getAwakeTime(), Processor.getIdleTime()));
             if(Processor.getBurstTime() > Processor.getRunningTime()) queue.add(Processor);
             if(!queue.isEmpty()) {
                 Processor = queue.get(0);

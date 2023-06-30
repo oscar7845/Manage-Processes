@@ -42,21 +42,15 @@ public abstract class Scheduler {
         }
     }
 
-    public void changeProcess(int currentTime){
-        Processor.setIdleTime(currentTime);
-        if(Processor.getArrivalTime() != Processor.getIdleTime()) result.add(new Process(Processor.getID(), Processor.getAwakeTime(), Processor.getIdleTime()));
-        if(!queue.isEmpty()) {
-            Processor = queue.get(0);
-            Processor.setAwakeTime(currentTime);
-            queue.remove(0);
-        }
-        else this.setIdle(currentTime);
-    }
+    public abstract void changeProcess(int currentTime);
+
     public abstract void run();
 
     public static void main(String args[]){
-        Scheduler a = new RRScheduler(2);
-        a.insertProcess(new Process("1", 0, 3));
+        Scheduler a = new FCFSScheduler();
+        a.insertProcess(new Process("1", 1, 4));
+        a.insertProcess(new Process("2", 2, 4));
+        a.insertProcess(new Process("3", 3, 4));
         a.run();
     }
 }

@@ -1,4 +1,15 @@
 public class FCFSScheduler extends Scheduler {
+    public void changeProcess(int currentTime){
+        Processor.setIdleTime(currentTime);
+        if(!Processor.getID().equals("idle")) result.add(new Process(Processor.getID(), Processor.getAwakeTime(), Processor.getIdleTime()));
+        if(!queue.isEmpty()) {
+            Processor = queue.get(0);
+            Processor.setAwakeTime(currentTime);
+            queue.remove(0);
+        }
+        else this.setIdle(currentTime);
+    }
+
     public void run(){
         int schedulingTime = getSchedulingTime();
         for(int i = 0; i <= schedulingTime; i++){

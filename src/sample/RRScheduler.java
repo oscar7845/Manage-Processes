@@ -16,13 +16,13 @@ public class RRScheduler extends Scheduler {
         if(Processor.getBurstTime() > Processor.getRunningTime()){
             if(!queue.isEmpty()){
                 Processor.setIdleTime(currentTime);
-                if(Processor.getArrivalTime() != Processor.getIdleTime()) result.add(new Process(Processor.getID(), Processor.getAwakeTime(), Processor.getIdleTime()));
+                if(!Processor.getID().equals("idle")) result.add(new Process(Processor.getID(), Processor.getAwakeTime(), Processor.getIdleTime()));
                 queue.add(Processor);
             }
         }
         else{
             Processor.setIdleTime(currentTime);
-            if(Processor.getArrivalTime() != Processor.getIdleTime()) result.add(new Process(Processor.getID(), Processor.getAwakeTime(), Processor.getIdleTime()));
+            if(!Processor.getID().equals("idle")) result.add(new Process(Processor.getID(), Processor.getAwakeTime(), Processor.getIdleTime()));
             if(!queue.isEmpty()) {
                 Processor = queue.get(0);
                 Processor.setAwakeTime(currentTime);
