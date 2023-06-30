@@ -21,6 +21,10 @@ public class Process {
     public String getPID() {return PID;}
     public int getInputTime() {return arrivalTime;}
 
+    public int getWaitingTime(){
+        return getTurnaroundTime() - getBurstTime();
+    }
+
     public String getID() {
         return PID;
     }
@@ -73,9 +77,7 @@ public class Process {
         this.awakeTime = awakeTime;
     }
 
-    public int getWaitingTime(){
-        return this.getTurnaroundTime() - this.getBurstTime();
-    }
+
     public float getNTT(){
         return (float)getTurnaroundTime()/getBurstTime();
     }
