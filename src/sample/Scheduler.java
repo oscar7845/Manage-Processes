@@ -1,4 +1,7 @@
+package sample;
+
 import java.util.ArrayList;
+import sample.Process;
 
 public abstract class Scheduler {
     ArrayList<Process> pArr;
@@ -42,15 +45,25 @@ public abstract class Scheduler {
         }
     }
 
-    public abstract void changeProcess(int currentTime);
-
+    public void changeProcess(int currentTime){
+        Processor.setIdleTime(currentTime);
+        if(Processor.getArrivalTime() != Processor.getIdleTime()) result.add(new Process(Processor.getID(), Processor.getAwakeTime(), Processor.getIdleTime()));
+        if(!queue.isEmpty()) {
+            Processor = queue.get(0);
+            Processor.setAwakeTime(currentTime);
+            queue.remove(0);
+        }
+        else this.setIdle(currentTime);
+    }
     public abstract void run();
 
     public static void main(String args[]){
-        Scheduler a = new FCFSScheduler();
-        a.insertProcess(new Process("1", 1, 4));
-        a.insertProcess(new Process("2", 2, 4));
-        a.insertProcess(new Process("3", 3, 4));
+        Scheduler a = new SPNScheduler();
+        a.insertProcess(new Process("1", 0, 3));
+        a.insertProcess(new Process("2", 2, 6));
+        a.insertProcess(new Process("3", 4, 4));
+        a.insertProcess(new Process("4", 16, 5));
+        a.insertProcess(new Process("5", 8, 2));
         a.run();
     }
 }
