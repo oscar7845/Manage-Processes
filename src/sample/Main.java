@@ -18,6 +18,8 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class Main extends Application {
 
@@ -25,6 +27,7 @@ public class Main extends Application {
     private Button processSchedule;
     private TextField processInputTime;
     private TextField processBurstTime;
+    private TextField timeQuantom;
     private RadioButton FCFS;
     private RadioButton RR;
     private RadioButton SPN;
@@ -48,6 +51,7 @@ public class Main extends Application {
         primaryStage.getScene().getStylesheets().add("sample/ganttchartStyle.css");
         primaryStage.show();
         initView();
+
 
         processList = new CategoryAxis();
         processTime = new NumberAxis();
@@ -75,6 +79,7 @@ public class Main extends Application {
         ganttChart = (StackedBarChart) root.lookup("#gantt_chart");
         processInputTime = (TextField) root.lookup("#input_time");
         processBurstTime = (TextField) root.lookup("#burst_time");
+        timeQuantom = (TextField) root.lookup("#time_quantom");
         FCFS = (RadioButton) root.lookup("#FCFS");
         RR = (RadioButton) root.lookup("#RR");
         SPN = (RadioButton) root.lookup("#SPN");
@@ -83,7 +88,7 @@ public class Main extends Application {
         FTW = (RadioButton) root.lookup("#FTW");
     }
 
-    private ArrayList<XYChart.Series<Number, String>> fcfs(Scheduler s) {
+    private ArrayList<XYChart.Series<Number, String>> runScheduling(Scheduler s) {
         ArrayList<XYChart.Series<Number, String>> schedulings = new ArrayList<>();
         s.pArr = processArrayList;
         s.run();
@@ -98,6 +103,7 @@ public class Main extends Application {
         return schedulings;
     }
 
+
     public void onClickedScheduleButton() {
         System.out.println("Process Scheduling Button clicked.");
         ArrayList<XYChart.Series<Number, String>> schedulings = null;
@@ -106,11 +112,12 @@ public class Main extends Application {
         if (FCFS.isSelected()) {
             System.out.println("FCFS");
             s = new FCFSScheduler();
-            schedulings = fcfs(s);
         } else if (RR.isSelected()) {
             System.out.println("RR");
+            s = new RRScheduler(Integer.parseInt(timeQuantom.getText()));
         } else if (SPN.isSelected()) {
             System.out.println("SPN");
+            
         } else if (SRTN.isSelected()) {
             System.out.println("SRTN");
         } else if (HRRN.isSelected()) {
@@ -119,6 +126,7 @@ public class Main extends Application {
             System.out.println("FTW");
         }
 
+        schedulings = runScheduling(s);
         ganttChart.getData().addAll(schedulings);
 
         for (Node n : ganttChart.lookupAll(".default-color0.chart-bar")) {
@@ -127,6 +135,7 @@ public class Main extends Application {
 
         TableView resultTable = (TableView) root.lookup("#output_table");
         ArrayList<ResultProcess> result = new ArrayList<>(s.result.size());
+        HashSet<Integer> pidSet = new HashSet<>();
 
         for(int i=0;i<s.result.size();i++){
             Process process = s.result.get(i);
@@ -137,9 +146,13 @@ public class Main extends Application {
                     break;
                 }
             }
-            if(origin != null)
-                result.add(new ResultProcess(process.getPID(),origin.getTurnaroundTime() - origin.getBurstTime(),
-                        origin.getTurnaroundTime(),(float)origin.getTurnaroundTime()/origin.getBurstTime()));
+
+            if(origin != null){
+                if( pidSet.add(Integer.parseInt(origin.getPID())) ){
+                    result.add(new ResultProcess(process.getPID(),origin.getTurnaroundTime() - origin.getBurstTime(),
+                            origin.getTurnaroundTime(),(float)origin.getTurnaroundTime()/origin.getBurstTime()));
+                }
+            }
         }
         resultTable.getItems().addAll(result);
     }
