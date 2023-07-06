@@ -2,28 +2,25 @@ package sample;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.chart.*;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.StackedBarChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.util.*;
-
-import sample.FCFSScheduler;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Main extends Application {
 
-    private FCFSScheduler fcfs;
     private Button processAdd;
     private Button processSchedule;
     private TextField processInputTime;
@@ -34,14 +31,12 @@ public class Main extends Application {
     private RadioButton SRTN;
     private RadioButton HRRN;
     private RadioButton FTW;
-    final NumberAxis xAxis = new NumberAxis();
-    final CategoryAxis yAxis = new CategoryAxis();
-    @FXML
-    private static GanttChart<Number, String> ganttChart;
+    private StackedBarChart<Number, String> ganttChart;
     private CategoryAxis processList;
     private NumberAxis processTime;
     private Parent root;
-    private static ArrayList<Process> processArrayList = new ArrayList<>();
+
+    private ArrayList<Process> processArrayList = new ArrayList<>();
 
     private int pidSequence = 0;
 
@@ -60,19 +55,24 @@ public class Main extends Application {
         processList.setLabel("category");
         processTime.setLabel("Process scheduling.");
 
+        var processKind = FXCollections.<String>observableArrayList(Arrays.asList("PROCESS"));
+        processList.setCategories(processKind);
+
         processAdd = (Button) root.lookup("#process_add");
         processAdd.setOnAction(actionEvent -> {
             onClickedProccessAddButton();
         });
 
+
         processSchedule = (Button) root.lookup("#scheduling_start");
         processSchedule.setOnAction(actionEvent -> {
             onClickedScheduleButton();
         });
+
     }
 
     private void initView() {
-        ganttChart = (GanttChart) root.lookup("#gantt_chart");
+        ganttChart = (StackedBarChart) root.lookup("#gantt_chart");
         processInputTime = (TextField) root.lookup("#input_time");
         processBurstTime = (TextField) root.lookup("#burst_time");
         FCFS = (RadioButton) root.lookup("#FCFS");
@@ -83,51 +83,30 @@ public class Main extends Application {
         FTW = (RadioButton) root.lookup("#FTW");
     }
 
-    private void activateChart(Scheduler s) {
+    private ArrayList<XYChart.Series<Number, String>> fcfs(Scheduler s) {
         ArrayList<XYChart.Series<Number, String>> schedulings = new ArrayList<>();
-        HashMap<String, String> colorHashMap = new HashMap<>();
-        int num = 0;
-        String color;
         s.pArr = processArrayList;
         s.run();
-
-        for (Process process : s.result) {
+        for(int i=0;i<s.result.size();i++){
             XYChart.Series<Number, String> scheduling = new XYChart.Series<>();
-            scheduling.setName(process.getPID());
-            if(colorHashMap.isEmpty()) {
-                num++;
-                color = "status-0";
-                colorHashMap.put(process.getPID(),color);
-            }
-            else if(colorHashMap.containsKey(process.getPID()))
-                color = colorHashMap.get(process.getPID());
-            else
-            {
-                color = "status-"+num%11;
-                colorHashMap.put(process.getPID(),color);
-                num++;
+            int takenTime = s.result.get(i).getBurstTime() - s.result.get(i).getArrivalTime();
 
-            }
-            scheduling.getData().add(new XYChart.Data<>(process.getArrivalTime(), process.getPID(), new GanttChart.ExtraData(process.getBurstTime() - process.getArrivalTime(), color)));
+            scheduling.getData().add(new XYChart.Data<>(takenTime, ""));
             schedulings.add(scheduling);
         }
 
-        //ganttChart.getStylesheets().add(getClass().getResource("ganttchartStyle.css").toExternalForm());
-        ganttChart.getData().addAll(schedulings);
-    }
-
-    public void setColor(ArrayList<XYChart.Series<Number, String>> schedulings) {
-
+        return schedulings;
     }
 
     public void onClickedScheduleButton() {
         System.out.println("Process Scheduling Button clicked.");
-
+        ArrayList<XYChart.Series<Number, String>> schedulings = null;
+        Scheduler s = null;
 
         if (FCFS.isSelected()) {
             System.out.println("FCFS");
-            activateChart(new FCFSScheduler());
-
+            s = new FCFSScheduler();
+            schedulings = fcfs(s);
         } else if (RR.isSelected()) {
             System.out.println("RR");
         } else if (SPN.isSelected()) {
@@ -139,6 +118,30 @@ public class Main extends Application {
         } else if (FTW.isSelected()) {
             System.out.println("FTW");
         }
+
+        ganttChart.getData().addAll(schedulings);
+
+        for (Node n : ganttChart.lookupAll(".default-color0.chart-bar")) {
+            n.setStyle("-fx-bar-fill: yellow;");
+        }
+
+        TableView resultTable = (TableView) root.lookup("#output_table");
+        ArrayList<ResultProcess> result = new ArrayList<>(s.result.size());
+
+        for(int i=0;i<s.result.size();i++){
+            Process process = s.result.get(i);
+            Process origin = null;
+            for(int j=0;j<s.pArr.size();j++){
+                if(s.pArr.get(j).getPID().equals(process.getPID())){
+                    origin = s.pArr.get(j);
+                    break;
+                }
+            }
+            if(origin != null)
+                result.add(new ResultProcess(process.getPID(),origin.getTurnaroundTime() - origin.getBurstTime(),
+                        origin.getTurnaroundTime(),(float)origin.getTurnaroundTime()/origin.getBurstTime()));
+        }
+        resultTable.getItems().addAll(result);
     }
 
     public void onClickedProccessAddButton() {
@@ -147,18 +150,18 @@ public class Main extends Application {
         try {
             inputTime = Integer.parseInt(processInputTime.getText());
             burstTime = Integer.parseInt(processBurstTime.getText());
-        } catch (Exception e) {
+        } catch (Exception e) { e.printStackTrace();
         }
         System.out.printf("inputTime is %d, burstTime is %d\n", inputTime, burstTime);
+
         TableView processTable = (TableView) root.lookup("#process_table");
         Process input = new Process(Integer.toString(pidSequence), inputTime, burstTime);
         processTable.getItems().add(input);
         processArrayList.add(input);
         pidSequence++;
-    }
 
-    public void fcfsGanttChart() {
-
+        processInputTime.setText("");
+        processBurstTime.setText("");
     }
 
     public static void main(String[] args) {
