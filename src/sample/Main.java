@@ -67,7 +67,6 @@ public class Main extends Application {
             onClickedProccessAddButton();
         });
 
-
         processSchedule = (Button) root.lookup("#scheduling_start");
         processSchedule.setOnAction(actionEvent -> {
             onClickedScheduleButton();
@@ -95,7 +94,6 @@ public class Main extends Application {
         for(int i=0;i<s.result.size();i++){
             XYChart.Series<Number, String> scheduling = new XYChart.Series<>();
             int takenTime = s.result.get(i).getBurstTime() - s.result.get(i).getArrivalTime();
-
             scheduling.getData().add(new XYChart.Data<>(takenTime, ""));
             schedulings.add(scheduling);
         }
