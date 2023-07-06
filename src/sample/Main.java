@@ -16,10 +16,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 public class Main extends Application {
 
@@ -33,7 +30,7 @@ public class Main extends Application {
     private RadioButton SPN;
     private RadioButton SRTN;
     private RadioButton HRRN;
-    private RadioButton FTW;
+    private RadioButton MRRN;
     private StackedBarChart<Number, String> ganttChart;
     private CategoryAxis processList;
     private NumberAxis processTime;
@@ -59,8 +56,8 @@ public class Main extends Application {
         processList.setLabel("category");
         processTime.setLabel("Process scheduling.");
 
-        var processKind = FXCollections.<String>observableArrayList(Arrays.asList("PROCESS"));
-        processList.setCategories(processKind);
+        //var processKind = FXCollections.<String>observableArrayList(Arrays.asList("PROCESS"));
+        //processList.setCategories(processKind);
 
         processAdd = (Button) root.lookup("#process_add");
         processAdd.setOnAction(actionEvent -> {
@@ -84,7 +81,7 @@ public class Main extends Application {
         SPN = (RadioButton) root.lookup("#SPN");
         SRTN = (RadioButton) root.lookup("#SRTN");
         HRRN = (RadioButton) root.lookup("#HRRN");
-        FTW = (RadioButton) root.lookup("#FTW");
+        MRRN = (RadioButton) root.lookup("#FTW");
     }
 
     private ArrayList<XYChart.Series<Number, String>> runScheduling(Scheduler s) {
@@ -94,6 +91,7 @@ public class Main extends Application {
         for(int i=0;i<s.result.size();i++){
             XYChart.Series<Number, String> scheduling = new XYChart.Series<>();
             int takenTime = s.result.get(i).getBurstTime() - s.result.get(i).getArrivalTime();
+
             scheduling.getData().add(new XYChart.Data<>(takenTime, ""));
             schedulings.add(scheduling);
         }
@@ -115,13 +113,14 @@ public class Main extends Application {
             s = new RRScheduler(Integer.parseInt(timeQuantom.getText()));
         } else if (SPN.isSelected()) {
             System.out.println("SPN");
-            
+            s = new SPNScheduler();
         } else if (SRTN.isSelected()) {
             System.out.println("SRTN");
+            s = new SRTNScheduler();
         } else if (HRRN.isSelected()) {
             System.out.println("HRRN");
-        } else if (FTW.isSelected()) {
-            System.out.println("FTW");
+        } else if (MRRN.isSelected()) {
+            System.out.println("MRRN");
         }
 
         schedulings = runScheduling(s);
@@ -132,7 +131,7 @@ public class Main extends Application {
         }
 
         TableView resultTable = (TableView) root.lookup("#output_table");
-        ArrayList<ResultProcess> result = new ArrayList<>(s.result.size());
+        List<ResultProcess> result = new ArrayList<>(s.result.size());
         HashSet<Integer> pidSet = new HashSet<>();
 
         for(int i=0;i<s.result.size();i++){
@@ -152,7 +151,9 @@ public class Main extends Application {
                 }
             }
         }
-        resultTable.getItems().addAll(result);
+
+        //Collections.sort(result);
+        //resultTable.getItems().addAll(result);
     }
 
     public void onClickedProccessAddButton() {
