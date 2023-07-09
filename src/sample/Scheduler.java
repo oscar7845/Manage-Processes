@@ -1,3 +1,5 @@
+package sample;
+
 import java.util.ArrayList;
 
 public abstract class Scheduler {
@@ -12,12 +14,10 @@ public abstract class Scheduler {
         result = new ArrayList<Process>();
         setIdle(0);
     }
-
     public void setIdle(int i){
         Processor = new Process("idle", i, 0);
         Processor.setAwakeTime(i);
     }
-
     public int getSchedulingTime() {
         int totalBT = 0;
         for (int i = 0; i < pArr.size(); i++) {
@@ -25,11 +25,9 @@ public abstract class Scheduler {
         }
         return totalBT;
     }
-
     public void insertProcess(Process pi){
         pArr.add(pi);
     }
-
     public void insertQueue(int currentTime){
         for(int i = 0; i < pArr.size(); i++){
             if(pArr.get(i).getArrivalTime() == currentTime) queue.add(pArr.get(i));

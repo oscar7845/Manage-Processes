@@ -1,3 +1,5 @@
+package sample;
+
 public class RRScheduler extends Scheduler {
     private int delta;
 
@@ -18,6 +20,9 @@ public class RRScheduler extends Scheduler {
                 Processor.setIdleTime(currentTime);
                 if(!Processor.getID().equals("idle")) result.add(new Process(Processor.getID(), Processor.getAwakeTime(), Processor.getIdleTime()));
                 queue.add(Processor);
+                Processor = queue.get(0);
+                Processor.setAwakeTime(currentTime);
+                queue.remove(0);
             }
         }
         else{

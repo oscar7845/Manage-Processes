@@ -1,3 +1,5 @@
+package sample;
+
 public class MRRScheduler extends Scheduler {
     private int delta;
 

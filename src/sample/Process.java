@@ -1,3 +1,5 @@
+package sample;
+
 public class Process {
     private String ID;
     private int arrivalTime;
@@ -14,6 +16,13 @@ public class Process {
         setRunningTime(0);
         setIdleTime(0);
         setTurnaroundTime(0);
+    }
+
+    public String getPID() { 
+        return ID;
+    }
+    public int getInputTime(){
+        return arrivalTime;
     }
 
     public String getID() {
