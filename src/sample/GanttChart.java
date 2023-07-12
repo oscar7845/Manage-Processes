@@ -17,12 +17,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
 public class GanttChart<X,Y> extends XYChart<X,Y> {
-
     public static class ExtraData {
-
         public long length;
         public String styleClass;
-
 
         public ExtraData(long lengthMs, String styleClass) {
             super();
@@ -41,8 +38,6 @@ public class GanttChart<X,Y> extends XYChart<X,Y> {
         public void setStyleClass(String styleClass) {
             this.styleClass = styleClass;
         }
-
-
     }
 
     private double blockHeight = 10;
@@ -97,6 +92,8 @@ public class GanttChart<X,Y> extends XYChart<X,Y> {
                         ellipse.setHeight(getBlockHeight() * ((getYAxis() instanceof NumberAxis) ? Math.abs(((NumberAxis)getYAxis()).getScale()) : 1));
                         y -= getBlockHeight() / 2.0;
 
+                        // Note: workaround for RT-7689
+                        // The region doesn't update itself when the shape is mutated in place, so we null out and then restore the shape in order to force invalidation.
                         region.setShape(null);
                         region.setShape(ellipse);
                         region.setScaleShape(false);
@@ -147,9 +144,7 @@ public class GanttChart<X,Y> extends XYChart<X,Y> {
             getPlotChildren().remove(container);
         }
         removeSeriesFromDisplay(series);
-
     }
-
 
     private Node createContainer(Series<X, Y> series, int seriesIndex, final Data<X,Y> item, int itemIndex) {
 
@@ -161,7 +156,6 @@ public class GanttChart<X,Y> extends XYChart<X,Y> {
         }
 
         container.getStyleClass().add( getStyleClass( item.getExtraValue()));
-
         return container;
     }
 
@@ -188,5 +182,4 @@ public class GanttChart<X,Y> extends XYChart<X,Y> {
             if(yData != null) ya.invalidateRange(yData);
         }
     }
-
 }
