@@ -5,11 +5,15 @@ public class SRTNScheduler extends Scheduler{
         int schedulingTime = getSchedulingTime();
         for (int i = 0; i <= schedulingTime; i++) {
             insertQueue(i);
+            // If the processor is in the IDLE state
             if (Processor.getID().equals("idle")) {
+                // idle 상태 해제
                 if (!queue.isEmpty()) {
+                    // Add scheduling time for non-default IDLE states
                     if (Processor.getArrivalTime() != 0) schedulingTime++;
                     changeProcess(i);
                 }
+                // stay idle
                 else {
                     schedulingTime++;
                     continue;
