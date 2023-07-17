@@ -1,26 +1,15 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.*;
-
-
-import sample.FCFSScheduler;
-
 
 public class Main extends Application {
 
@@ -29,20 +18,15 @@ public class Main extends Application {
     private Button processClear;
     private TextField processInputTime;
     private TextField processBurstTime;
-    private TextField timeQuantom;
+    private TextField timeQuantum;
     private RadioButton FCFS;
     private RadioButton RR;
     private RadioButton SPN;
     private RadioButton SRTN;
     private RadioButton HRRN;
     private RadioButton MRR;
-    final NumberAxis xAxis = new NumberAxis();
-    final CategoryAxis yAxis = new CategoryAxis();
-    @FXML
-    private static GanttChart<Number, String> ganttChart;
-    private CategoryAxis processList;
-    private NumberAxis processTime;
     private Parent root;
+    private static GanttChart<Number, String> ganttChart;
     private static ArrayList<Process> processArrayList = new ArrayList<>();
 
     private int pidSequence = 0;
@@ -56,43 +40,74 @@ public class Main extends Application {
         primaryStage.show();
         initView();
 
-
-        processList = new CategoryAxis();
-        processTime = new NumberAxis();
-
-        processList.setLabel("category");
-        processTime.setLabel("Process scheduling.");
-
-
-        processAdd = (Button) root.lookup("#process_add");
+        //--------------------// 
+        // Process Add Button // 
+        //--------------------//
+        
         processAdd.setOnAction(actionEvent -> {
-            onClickedProccessAddButton();
+            onClickedProcessAddButton();
         });
 
+        //-------------------------// 
+        // Process Schedule Button // 
+        //-------------------------//
 
-        processSchedule = (Button) root.lookup("#scheduling_start");
         processSchedule.setOnAction(actionEvent -> {
             onClickedScheduleButton();
         });
 
-
-        processClear = (Button) root.lookup("#process_clear");
+        //----------------------// 
+        // Process Clear Button // 
+        //----------------------//
+        
         processClear.setOnAction(actionEvent -> {
             onClickedProcessClearButton();
         });
     }
 
     private void initView() {
+        processAdd = (Button) root.lookup("#process_add");
+        processSchedule = (Button) root.lookup("#scheduling_start");
+        processClear = (Button) root.lookup("#process_clear");
         ganttChart = (GanttChart) root.lookup("#gantt_chart");
         processInputTime = (TextField) root.lookup("#input_time");
         processBurstTime = (TextField) root.lookup("#burst_time");
-        timeQuantom = (TextField) root.lookup("#time_quantom");
+        timeQuantum = (TextField) root.lookup("#time_quantum");
         FCFS = (RadioButton) root.lookup("#FCFS");
         RR = (RadioButton) root.lookup("#RR");
         SPN = (RadioButton) root.lookup("#SPN");
         SRTN = (RadioButton) root.lookup("#SRTN");
         HRRN = (RadioButton) root.lookup("#HRRN");
         MRR = (RadioButton) root.lookup("#MRR");
+        setVisiblityTimeQuantum(false);
+        initRadioButton();
+    }
+
+    public void initRadioButton() {
+        FCFS.setOnMouseClicked(event -> {
+            setVisiblityTimeQuantum(false);
+        });
+        RR.setOnMouseClicked(event -> {
+                    setVisiblityTimeQuantum(true);
+                }
+        );
+        SPN.setOnMouseClicked(event -> {
+                    setVisiblityTimeQuantum(false);
+                }
+        );
+        SRTN.setOnMouseClicked(event -> {
+                    setVisiblityTimeQuantum(false);
+                }
+        );
+        HRRN.setOnMouseClicked(event -> {
+                    setVisiblityTimeQuantum(false);
+                }
+        );
+        MRR.setOnMouseClicked(event -> {
+                    setVisiblityTimeQuantum(true);
+                }
+        );
+
     }
 
     private void activateChart(Scheduler s) {
@@ -100,8 +115,16 @@ public class Main extends Application {
         HashMap<String, String> colorHashMap = new HashMap<>();
         int num = 0;
         String color;
-        for(Process p : s.pArr){
-            System.out.println("HEY Im here!!! " + p.getID() + ", " + p.getArrivalTime() + "ASDASDASD");
+        if(processArrayList.size() <= 0)
+        {
+            makeAlertDialog("Add a Process");
+            return;
+        }
+        for (int i = 0; i < processArrayList.size(); i++) {
+            processArrayList.get(i).setRunningTime(0);
+            processArrayList.get(i).setTurnaroundTime(0);
+            processArrayList.get(i).setIdleTime(0);
+            processArrayList.get(i).setAwakeTime(0);
         }
         s.pArr.addAll(processArrayList);
         s.run();
@@ -128,38 +151,35 @@ public class Main extends Application {
         //ganttChart.getStylesheets().add(getClass().getResource("ganttchartStyle.css").toExternalForm());
         ganttChart.getData().clear();
         ganttChart.layout();
+        ganttChart.getYAxis().setTickLabelFill(Color.CHOCOLATE);
+        ganttChart.getYAxis().setTickLabelGap(10);
         ganttChart.getData().addAll(schedulings);
-
-
+        ganttChart.getYAxis().setLabel("PID");
+        ganttChart.getXAxis().setLabel("Time");
+        ganttChart.getYAxis().setAnimated(false);
     }
 
-
-    private ArrayList<XYChart.Series<Number, String>> runScheduling(Scheduler s) {
-        ArrayList<XYChart.Series<Number, String>> schedulings = new ArrayList<>();
-        s.pArr = processArrayList;
-        s.run();
-        for (int i = 0; i < s.result.size(); i++) {
-            XYChart.Series<Number, String> scheduling = new XYChart.Series<>();
-            int takenTime = s.result.get(i).getBurstTime() - s.result.get(i).getArrivalTime();
-            scheduling.getData().add(new XYChart.Data<>(takenTime, ""));
-            schedulings.add(scheduling);
-        }
-
-
-        return schedulings;
+    public void setVisiblityTimeQuantum(boolean flag) {
+        if (flag)
+            timeQuantum.setVisible(true);
+        else
+            timeQuantum.setVisible(false);
     }
-
 
     public void onClickedScheduleButton() {
-        ArrayList<XYChart.Series<Number, String>> schedulings = null;
         Scheduler s = null;
         System.out.println("Process Scheduling Button clicked.");
         if (FCFS.isSelected()) {
             System.out.println("FCFS");
             s = new FCFSScheduler();
-        } else if (RR.isSelected()){
-            System.out.println("RR");
-            s = new RRScheduler(Integer.parseInt(timeQuantom.getText()));
+        } else if (RR.isSelected()) {
+            if (!timeQuantum.getText().trim().equals("")) {
+                System.out.println("RR");
+                s = new RRScheduler(Integer.parseInt(timeQuantum.getText()));
+            } else {
+                makeAlertDialog("Enter the Time Quantum");
+                return;
+            }
         } else if (SPN.isSelected()) {
             System.out.println("SPN");
             s = new SPNScheduler();
@@ -170,28 +190,41 @@ public class Main extends Application {
             System.out.println("HRRN");
             s = new HRRNScheduler();
         } else if (MRR.isSelected()) {
-            System.out.println("MRRN");
-            s = new MRRScheduler(Integer.parseInt(timeQuantom.getText()));
+            if (!timeQuantum.getText().trim().equals("")) {
+                System.out.println("MRRN");
+                s = new MRRScheduler(Integer.parseInt(timeQuantum.getText()));
+            } else {
+                makeAlertDialog("Enter the Time Quantum");
+                return;
+            }
         }
-
 
         activateChart(s);
 
+        //-------------------------// 
+        // Scheduling Result Table // 
+        //-------------------------//
 
         TableView resultTable = (TableView) root.lookup("#output_table");
-        List<ResultProcess> result = new ArrayList<>(s.result.size());
+        ((TableView) root.lookup("#output_table")).getItems().clear();
+        List<ResultProcess> result = new ArrayList<>(s.result.size()); // ArrayList to List to use Collections.sort()
         HashSet<Integer> pidSet = new HashSet<>();
 
         for (int i = 0; i < s.result.size(); i++) {
+            // process of scheduling output
             Process process = s.result.get(i);
+            // process of scheduling input
             Process origin = null;
+
+            // look for matching PID and process of current output process
             for (int j = 0; j < s.pArr.size(); j++) {
                 if (s.pArr.get(j).getPID().equals(process.getPID())) {
                     origin = s.pArr.get(j);
                     break;
-                }
+                } 
             }
 
+            // just ignore if process is duplicated in output list
             if (origin != null) {
                 if (pidSet.add(Integer.parseInt(origin.getPID()))) {
                     result.add(new ResultProcess(process.getPID(), origin.getTurnaroundTime() - origin.getBurstTime(),
@@ -200,47 +233,73 @@ public class Main extends Application {
             }
         }
 
-        Collections.sort(result);
+        // check compareTo method in ResultProcess.java
+        Collections.sort(result); 
         resultTable.getItems().addAll(result);
-
-
-        processArrayList.clear();
     }
 
+    public void makeAlertDialog(String info) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Notifications");
+        alert.setHeaderText(null);
+        alert.setContentText(info);
 
-    public void onClickedProccessAddButton() {
+        alert.showAndWait();
+    }
+
+    public void onClickedProcessAddButton() {
         System.out.println("Process Add Button clicked.");
         int inputTime = 0, burstTime = 0;
+        if (processInputTime.getText().equals("") ||
+                processBurstTime.getText().equals("")) {
+            makeAlertDialog("Enter a value");
+            return;
+        }
         try {
             inputTime = Integer.parseInt(processInputTime.getText());
             burstTime = Integer.parseInt(processBurstTime.getText());
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
+        if (inputTime <= 0) {
+            makeAlertDialog("Input time must be a positive value.");
+            return;
+        }
+        if (burstTime <= 0) {
+            makeAlertDialog("Burst time must be greater than 0.");
+            return;
+        }
+
         System.out.printf("inputTime is %d, burstTime is %d\n", inputTime, burstTime);
 
+        //--------------------------// 
+        // Process Table Management // 
+        //--------------------------//
+        
         TableView processTable = (TableView) root.lookup("#process_table");
         Process input = new Process(Integer.toString(pidSequence), inputTime, burstTime);
-        processTable.getItems().add(input);
+        processTable.getItems().add(input);        
         processArrayList.add(input);
         pidSequence++;
-
+        
+        // get TableView, insert Process, add to arraylist 
         processInputTime.setText("");
-        processBurstTime.setText("");
+        processBurstTime.setText("");    
     }
 
-    public void onClickedProcessClearButton(){
-        ((TableView)root.lookup("#process_table")).getItems().clear();
-        ((TableView)root.lookup("#output_table")).getItems().clear();
-        ((TextField)root.lookup("#input_time")).setText("");
-        ((TextField)root.lookup("#burst_time")).setText("");
-        ((TextField)root.lookup("#time_quantom")).setText("");
+    public void onClickedProcessClearButton () {
+        ((TableView) root.lookup("#process_table")).getItems().clear();
+        ((TableView) root.lookup("#output_table")).getItems().clear();
+        ((TextField) root.lookup("#input_time")).setText("");
+        ((TextField) root.lookup("#burst_time")).setText("");
+        ((TextField) root.lookup("#time_quantum")).setText("");
         processArrayList.clear();
         pidSequence = 0;
     }
 
-    public static void main(String[] args) {
+    public static void main (String[]args){
         launch(args);
-    }
-
+    }    
 }

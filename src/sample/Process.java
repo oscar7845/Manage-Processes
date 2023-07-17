@@ -2,12 +2,12 @@ package sample;
 
 public class Process {
     private String ID;
-    private int arrivalTime;
-    private int burstTime;
-    private int runningTime;
-    private int turnaroundTime;
-    private int idleTime;
-    private int awakeTime;
+    private int arrivalTime; // time the process arrived
+    private int burstTime; // tot execution time of the process
+    private int runningTime; // cumulative time the process has been running to date
+    private int turnaroundTime; // Process's complete turnaround time
+    private int idleTime; // when process was idle due to external factors
+    private int awakeTime; // when process woke up again
 
     public Process(String _ID, int _arrivalTime, int _burstTime){
         setID(_ID);
