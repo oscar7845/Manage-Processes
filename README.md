@@ -1,22 +1,17 @@
-OS Scheduler
-This tool simulates and visualizes process scheduling algorithms in operating systems, making them easier to grasp.
-
+# OS Scheduling Visualizer
+This application simulates the process scheduling algorithms in operating systems, and it provides visual results for a better understanding. 
 ## The Idea
-Understanding how processes are executed can be tricky due to its abstract nature. This tool helps by visualizing various scheduling algorithms in action, demonstrating how the computer allocates CPU time amongst processes.
-
+Scheduling governs the execution of processes and can be challenging to understnd since it is abstract. By visualizing how various scheduling algorithms operate in real time, I wanted to be able to get a clear understanding of how the algorithms distribute processor time among multiple processes.
 ## How it works
-Users input the processes (arrival and burst times) they wish to schedule. The tool then schedules these using one of the available algorithms: FCFS, RR, SPN, SRTN, HRRN, or MRR. It outputs a timeline showing process information such as waiting time, turnaround time, and normalized turnaround.
-
+You can feed the application with the processes (arrival times, and burst times) you want to schedule. The processes are then scheduled using the algorithm you chose between FCFS, RR, SPN, SRTN, HRRN, and MRR. Then we can see a visual representation of the timeline. For each process we can see data for waiting time, turnaround time, and normalized turnaround.
 ## How it was built
-used Java's abstract classes and interfaces to set up the scheduling algorithms. The GUI is created with JavaFX, which offers many features for user-friendly interfaces.
-The workspace.xml file contains all the necessary application components in a single jar file. It employs bookmarks and ChangeListManager for easy navigation and monitoring of file changes.
-
+Java abstract classes and interfaces define the general structure of the scheduling algorithms. JavaFX is used for the GUI and I chose it because of the many features we can use for creating interfaces that are pretty user-friendly. The data for processes and the scheduling results are stored in custom classes and ArrayLists are used to manage collections of objects.
+The file workspace.xml file packs everything - the whole app and stuff it needs to run - into one easy to uuse jar file. It uses Bookmarks to jump to important bits of code and uses ChangeListManager to keep an eye on any changes made to files.
 ## Bugs and challenges
-Initially, plsanned to have one visualization section but ended up dividing it into a graphical scheduling timeline and a table of process data. Had to manage potential concurrency issues due to the multithreaded nature of JavaFX applications.
-Code snippet for using Platform.runLater() to ensure UI updates run on the JavaFX app thread:
-
-sh
-Copy code
+I started with one visualization section but ended up breaking down the output into two parts which are the graphical representation of the scheduling timeline and a tabular representation of the process data.
+Also, an important part of the development was trying to mnage and avoid concurrency issues and this is due to the multi threaded nature of JavaFX application.
+You could use Platform.runLater() so that code affecting the UI runs on the JavaFX app thread. Example:
+```sh
 Label label = new Label();
 
 new Thread(() -> {
@@ -26,9 +21,8 @@ new Thread(() -> {
         label.setText(newTxt);
     });
 }).start();
-
+```
 ## Things learned
-Creating the scheduling algorithms has deepened our understanding of CPU scheduling and the trade-offs involved. 
-
+Implementing the scheduling algorithms helps to understand and appreciate the trade offs involved in CPU scheduling and the efficient scheduling in overall system performance.
 ## Roadmap
-Considering adding more scheduling algorithms like Shortest Job First (SJF), Priority Scheduling, and Multilevel Queue Scheduling. Looking at making the application more interactive, allowing users to step through the scheduling process one time unit at a time for a deeper understanding of the algorithms.
+What can be done is incorporate more scheduling algorithms like Shortest Job First (SJF), Priority Scheduling, and Multilevel Queue Scheduling. Add more interactivity to the application so that users can go through the scheduling process one unit of time at a time, which would provide an even better understanding of the algorithms.
