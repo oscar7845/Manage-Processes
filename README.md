@@ -22,6 +22,7 @@ new Thread(() -> {
     });
 }).start();
 ```
+Because UI updates in JavaFX must be performed on the JavaFX Application Thread, we use Platform.runLater() to make sure the update is executed on the correct thread.
 ## Things learned
 Implementing the scheduling algorithms helps to understand and appreciate the trade-offs involved in CPU scheduling and the efficient scheduling in overall system performance.
 ## Roadmap
